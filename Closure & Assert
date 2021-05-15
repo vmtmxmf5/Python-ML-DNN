@@ -1,0 +1,107 @@
+# Assert 함수 : 조건이 참이면 그냥 작동, 거짓일 경우 Assert Error 발생
+
+def apply_discount(product, discount):
+    price = int(product['price'] * (1.0 - discount))
+    assert 0 <= price <= product['price'] 
+    return price
+
+
+# assert vs if
+# if와 else를 활용하면 assert와 동일한 효과를 낼 수 있다. 하지만 그냥 assert를 쓰는게 더 효율적이다.
+# assert는 범위가 양수가 아니면 에러가 발생해야 하거나, 조건문이 거짓이면 에러가 나야 할 때 사용한다(방어적 코딩)
+# False -> 에러
+# 주의점 : 개발자가 에러를 확인하기 위한 용도로 써야 하지, 에러일 때를 제외하고 함수를 실행할 용도로 쓰면 안 된다. 해킹에 취약하고, interpreter에서 assert만 끌 수도 있기 때문이다.
+
+
+# assert vs try/except
+# assert 뒤에는 참/거짓을 구분할 수 있는 조건이 와야한다. try 구문은 return 때문에 def와 같이 쓰기 어렵다. 그리고 애초에 assert는 런타임 에러를 잡기 위한 용도가 아니다
+
+
+
+
+def yell(text):
+    return text.upper() + '!'
+
+bark = yell   
+del yell
+bark.__name__
+
+# func() == 함수를 실행한다
+# func == 함수 오브젝트
+# 함수 오브젝트는 천룡인이다
+# 첫째, 함수 오브젝트(f1)가 다른 함수(func2)의 argument가 될 수 있다
+#       func2(f1, 5)
+# 둘째, 함수 오브젝트는 return value가 될 수 있다        
+# 셋째, 함수 오브젝트를 변수에 assign할 수 있다. 심지어 함수 오브젝트 마저도 assign할 수 있다.
+#       func1 = sum  
+
+
+
+
+# closure란? outer argument(소음기)를 장착한 inner func object(권총)다. 
+
+# 생성 : closure = outer_function(outer_argument)
+# 기능 : closure = inner_function
+# 목적 : free vari.를 memoization용도로 사용하기 위해, 또는 2가지를 처리할 함수가 필요하기 때문에 사용한다.
+# 범주 : (cell = cache = nonlocal vari = free vari) ⊂
+         (__closure__ = h1 = cache_factorial) ⊂
+         global space
+# outer_argument에 어떤 object도 올 수 있다. 다만 주로, (1)func object가 오거나 (2)nonlocal argument 가 온다.
+# outer_function을 지워도 closure 함수는 작동한다.
+# 왜냐하면 closure함수 오브젝트 안에는 __closure__ 라는 nonlocal argument를 저장해두는 범주가 있고, 그 안에는 cell 형식으로 nonlocal_argument를 저장해두고 있기 때문이다.
+
+# 필요조건 : Closure -> 함수 중첩 & inner func. object 리턴
+
+def outer(tag):
+    tag = tag        # free vari. = unlocal argu.
+    def inner(txt):
+        text = txt
+        print(f'<{tag}> {text} <{tag}>')
+    return inner
+
+h1 = outer('h1')
+h2 = outer('h2')
+
+h1('안뇽하세요 여기는')
+h2('제가 만든 웹페이지임다')
+
+
+def in_cache(func):
+    cache = {}     # free vari. = unlocal argu.
+    def wrapper(n):
+        print(cache)
+        if n in cache:
+            return cache[n]
+        else:
+            cache[n] = func(n)     #outer argu. 사용
+            return cache[n]
+    return wrapper
+    
+def Factorial(n):
+    ret = 1
+    for i in range(1, n + 1):
+        ret *= i
+    return ret
+cache_factorial = in_cache(Factorial)
+cache_factorial(4)
+
+    
+## print(ret)을 하면 다른 함수하고 연결할 때 문제가 발생한다 
+## 값을 출력하고 저장하지 않기 때문에 다른 함수에서 계산 자체가 에러가 난다.
+
+## 빈 dict에 index를 걸면 key error뜬다
+a = {}
+a[3] == Factorial(3)
+
+
+# h1 = outer(x)    outer함수를 실행하면 x가 inner 함수 오브젝트 안으로 보내지고, h1에는 그 inner함수 오브젝트를 assign한다
+# h1() == inner 함수를 실행한다
+
+# 잠깐! 그렇다면 h1 = outer('smt')이 없다면?
+# h1 함수는 정의되지 않는다. 
+
+# 집합 관계 : inner함수 오브젝트 -> outer함수 argument 실행 -> h1함수 오브젝트
+# h1함수를 실행하기 위한 필요조건 : outer함수의 argument & inner함수 오브젝트를 실행하기 위한 argument
+
+
+        
