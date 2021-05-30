@@ -1,8 +1,12 @@
+# PTSA 데이터셋 생성 
+# 불러오기
 import pdb
 import numpy as np
 import pandas as pd
 
-## membership status
+
+
+# 가입 유저 데이터 생성
 years      = ['2014', '2015', '2016', '2017', '2018']
 userStatus = ['bronze', 'silver', 'gold', 'inactive']
 
@@ -15,15 +19,15 @@ year_joined = pd.DataFrame({'year_joined': user_years,
 num_emails_sent_weekly = 3
 
 
+# email 데이터 생성
 def never_open_rate(period_rng):
     return []
-
-# 조사기간 중 뉴스레터 열람횟수는? (간격 week)
+  
+### 조사기간 중 뉴스레터 열람횟수는? (간격 week)
 def constant_open_rate(period_rng):
     n, p = num_emails_sent_weekly, np.random.uniform(0, 1)
     num_opened = np.random.binomial(n, p, len(period_rng))
     return num_opened
-
 
 def open_rate_with_factor_change(period_rng, fac):
     
@@ -52,8 +56,7 @@ def decreasing_open_rate(period_rng):
     return open_rate_with_factor_change(period_rng, np.random.uniform(0.5, 0.99))
 
 
-
-# 기부 함수 용
+# 기부 데이터 생성
 def random_weekly_time_delta():
     days_of_week = [d for d in range(7)]
     
@@ -65,7 +68,6 @@ def random_weekly_time_delta():
            pd.Timedelta(str(np.random.choice(hours_of_day))    + "hours")   + \
            pd.Timedelta(str(np.random.choice(minute_of_hour))   + "minutes") + \
            pd.Timedelta(str(np.random.choice(second_of_minute)) + "seconds")
-
 
 
 def produce_donations(period_rng, user_behavior, num_emails, use_id, user_join_year):
@@ -100,8 +102,7 @@ def produce_donations(period_rng, user_behavior, num_emails, use_id, user_join_y
     return donations
 
 
-
-## run it!!!
+# 실행!!!
 behaviors = [never_open_rate, constant_open_rate, increasing_open_rate, decreasing_open_rate]
 user_behaviors = np.random.choice(behaviors, 1000, [0.2, 0.5, 0.1, 0.2])
 
